@@ -22,14 +22,15 @@ object DecodeLogic
     val terms = keys.toList.map(k => term(k))
     val termvalues = terms zip values.toList.map(term(_))
 
+    // keys shouldn't contains 2 BitPat which can contains the same bits
     for (t <- keys.zip(terms).tails; if !t.isEmpty)
       for (u <- t.tail)
         assert(!t.head._2.intersects(u._2), "DecodeLogic: keys " + t.head + " and " + u + " overlap")
 
     Cat((0 until default.getWidth.max(values.map(_.getWidth).max)).map({ case (i: Int) =>
-      val mint = termvalues.filter { case (k,t) => ((t.mask >> i) & 1) == 0 && ((t.value >> i) & 1) == 1 }.map(_._1)
-      val maxt = termvalues.filter { case (k,t) => ((t.mask >> i) & 1) == 0 && ((t.value >> i) & 1) == 0 }.map(_._1)
-      val dc = termvalues.filter { case (k,t) => ((t.mask >> i) & 1) == 1 }.map(_._1)
+      val mint = termvalues.filter { case (k,t) => ((t.mask >> i) & 1) == 0 && ((t.value >> i) & 1) == 1 }.map(_._1)    // min term
+      val maxt = termvalues.filter { case (k,t) => ((t.mask >> i) & 1) == 0 && ((t.value >> i) & 1) == 0 }.map(_._1)    // max term
+      val dc = termvalues.filter { case (k,t) => ((t.mask >> i) & 1) == 1 }.map(_._1)                                   // don't care
 
       if (((dterm.mask >> i) & 1) != 0) {
         logic(addr, addrWidth, cache, SimplifyDC(mint, maxt, addrWidth))

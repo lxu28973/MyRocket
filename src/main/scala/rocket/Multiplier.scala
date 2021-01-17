@@ -200,9 +200,9 @@ class PipelinedMultiplier(width: Int, latency: Int, nXpr: Int = 32) extends Modu
     DecodeLogic(in.bits.fn, List(X, X, X), decode).map(_.asBool)
   val cmdHalf = (width > 32).B && in.bits.dw === DW_32
 
-  val lhs = Cat(lhsSigned && in.bits.in1(width-1), in.bits.in1).asSInt
+  val lhs = Cat(lhsSigned && in.bits.in1(width-1), in.bits.in1).asSInt    // add 1 bit to operand to get lhs, to make lhs equal to operand no matter operand is signed or unsigned
   val rhs = Cat(rhsSigned && in.bits.in2(width-1), in.bits.in2).asSInt
-  val prod = lhs * rhs
+  val prod = lhs * rhs    // DONE: how this signed multiplier construct - read VLSI book
   val muxed = Mux(cmdHi, prod(2*width-1, width), Mux(cmdHalf, prod(width/2-1, 0).sextTo(width), prod(width-1, 0)))
 
   val resp = Pipe(in, latency-1)
