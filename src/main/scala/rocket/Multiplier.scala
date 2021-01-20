@@ -198,7 +198,7 @@ class PipelinedMultiplier(width: Int, latency: Int, nXpr: Int = 32) extends Modu
     FN_MULHSU -> List(Y, Y, N))
   val cmdHi :: lhsSigned :: rhsSigned :: Nil =
     DecodeLogic(in.bits.fn, List(X, X, X), decode).map(_.asBool)
-  val cmdHalf = (width > 32).B && in.bits.dw === DW_32
+  val cmdHalf = (width > 32).B && in.bits.dw === DW_32  // for MULW instruction
 
   val lhs = Cat(lhsSigned && in.bits.in1(width-1), in.bits.in1).asSInt    // add 1 bit to operand to get lhs, to make lhs equal to operand no matter operand is signed or unsigned
   val rhs = Cat(rhsSigned && in.bits.in2(width-1), in.bits.in2).asSInt
